@@ -31,7 +31,7 @@
 <script type="text/javascript">
 	let data1 = ['my','name','is','zhangmingzhi'];
 	let data2 = ['zmz'];
-	
+
 	document.addEventListener('DOMContentLoaded', event => {
 		console.log(d3);
 		let a = d3.selectAll(".a");
@@ -54,32 +54,47 @@
 		console.log(a);
 		//add svg
 		let rectHeight = 25;
-		setInterval( () =>{
-			let data3 = Array.from({length: 10}).map( item => ~~(Math.random() * 100));
-			d3.selectAll("svg").remove();
-			var svg = d3.select("body")
-			.append("svg")
-			.attr("id","fuck-you")
-			.attr("class","hehe")
-			.selectAll("rect")
-			.data(data3)
-			.enter()
-			.append("rect")
-			.attr("x",(text ,index) => {
-				return index * 25
-			})
-			.attr("y", 0)
-			.attr("height", text => text)
-			.attr("width", rectHeight -2)
-			.attr("class", (text ,index) => {
-				if(text > 50){
-					return "green";
-				}else if(text < 50){
-					return "red";
-				}
-			})
+        function makebar(){
+            let data3 = Array.from({length: 10}).map( item => ~~(Math.random() * 1000000));
+            d3.selectAll("svg").remove();
+            let scale = d3.scaleLinear().domain([d3.min(data3),d3.max(data3)]).range([2,195]);
+            let scaleforAxis = d3.scaleLinear().domain([1,10]).range([10,100]);
+            let axis = d3.axisBottom(scaleforAxis).ticks(10);
+            console.log(axis)
+            console.log(scale(29));
+            var svg = d3.select("body")
+            .append("svg")
+            .attr("id","fuck-you")
+            .attr("class","hehe")
+            .selectAll("rect")
+            .data(data3)
+            .enter()
+            .append("rect")
+            .on("click", (text, index,a,b,c) => {
+                console.log(text,index,a,b,c);
+            })
+            .attr("x",(text ,index) => {
+                return index * 25
+            })
+            .attr("y", 0)
 
-		},300);
+            .attr("height", text => scale(text))
+            .transition()
+            .duration(1000)
+            .attr("width", rectHeight -2)
+            .attr("fill", (text ,index) => {
+                return Math.random() > 0.5 ? "green" : 'red'
+            })
+            .attr("data-value", (text, i) => {
+                return `current data is ${text}`
+            })
+            //make aixes
+            d3.select("#fuck-you")
+            .append("g")
+            .attr("transform","translate(0,180)")
+            .call(axis)
+        }
+        makebar();
 	},false)
 </script>
 </html>
