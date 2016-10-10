@@ -3,9 +3,83 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<style>
+		#testspan{
+			color: lime;
+		}
+		.hehe{
+			width: 500px;
+			height: 200px;
+			border: solid 1px red;
+		}
+		.green{
+			fill: green;
+		}
+		.red{
+			fill: red;
+		}
+	</style>
 	<script src="d3main.js"></script>
 </head>
 <body>
-	
+	<div class="a" id='a'>aaa</div>
+	<div class="a">aaa</div>
+	<div class="a">aaa</div>
+	<div class="a">aaa</div>
+	<div class="a">aaa</div>
 </body>
+<script type="text/javascript">
+	let data1 = ['my','name','is','zhangmingzhi'];
+	let data2 = ['zmz'];
+	
+	document.addEventListener('DOMContentLoaded', event => {
+		console.log(d3);
+		let a = d3.selectAll(".a");
+		let alist = Array.from(a._groups[0]);
+		// a.datum(data1).text( (text,index) =>{
+		// 	return `my name is ${text} current @ ${index}`;
+		// })
+		a.data(data1).text((text, index,a) =>{
+			a[index].addEventListener("click", event =>{
+				console.log(event.target);
+			},false);
+			return `i say: ${text}!!! to you`;
+		})
+		.style("color","red")
+		.style("font-size","16px");
+		//inser element
+		// a.insert("p").text("this is inserted text!!")
+		//set innerhtml;
+		d3.select("#a").html("<span id='testspan'>11111</span>");
+		console.log(a);
+		//add svg
+		let rectHeight = 25;
+		setInterval( () =>{
+			let data3 = Array.from({length: 10}).map( item => ~~(Math.random() * 100));
+			d3.selectAll("svg").remove();
+			var svg = d3.select("body")
+			.append("svg")
+			.attr("id","fuck-you")
+			.attr("class","hehe")
+			.selectAll("rect")
+			.data(data3)
+			.enter()
+			.append("rect")
+			.attr("x",(text ,index) => {
+				return index * 25
+			})
+			.attr("y", 0)
+			.attr("height", text => text)
+			.attr("width", rectHeight -2)
+			.attr("class", (text ,index) => {
+				if(text > 50){
+					return "green";
+				}else if(text < 50){
+					return "red";
+				}
+			})
+
+		},300);
+	},false)
+</script>
 </html>

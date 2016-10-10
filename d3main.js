@@ -16,7 +16,7 @@ var bisector = function(compare) {
   return {
     left: function(a, x, lo, hi) {
       if (lo == null) lo = 0;
-      if (hi == null) hi = a.length;
+      if (hi == null) hi = a.len;
       while (lo < hi) {
         var mid = lo + hi >>> 1;
         if (compare(a[mid], x) < 0) lo = mid + 1;
