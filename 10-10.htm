@@ -34,33 +34,14 @@
 	let data2 = ['zmz'];
 
 	document.addEventListener('DOMContentLoaded', event => {
-		console.log(d3);
-		let a = d3.selectAll(".a");
-		let alist = Array.from(a._groups[0]);
-		// a.datum(data1).text( (text,index) =>{
-		// 	return `my name is ${text} current @ ${index}`;
-		// })
-		a.data(data1).text((text, index,a) =>{
-			a[index].addEventListener("click", event =>{
-				console.log(event.target);
-			},false);
-			return `i say: ${text}!!! to you`;
-		})
-		.style("color","red")
-		.style("font-size","16px");
-		//inser element
-		// a.insert("p").text("this is inserted text!!")
-		//set innerhtml;
-		d3.select("#a").html("<span id='testspan'>11111</span>");
-		console.log(a);
 		//add svg
 		let rectHeight = 50;
     function makebar(){
       let data3 = Array.from({length: 10}).map( item => ~~(Math.random() * 1000));
       d3.selectAll("svg").remove();
-      let Yscale = d3.scaleLinear().domain([d3.min(data3),d3.max(data3)]).range([2,180]);
-			let Xscale = d3.scaleLinear().domain([0,d3.max(data3)]).range([0,500]);
-      let scaleforAxis = d3.scaleLinear().domain([1,10]).range([0,500]);
+      let Yscale = d3.scaleLinear().domain([0,d3.max(data3)]).range([190,0]);
+			let Xscale = d3.scaleLinear().domain([0,data3.length]).range([10,490]);
+      let scaleforAxis = d3.scaleLinear().domain([1,10]).range([10,490]);
       let axis = d3.axisBottom(scaleforAxis);
       let svg = d3.select("body")
       .append("svg")
@@ -74,12 +55,12 @@
           console.log(text,index,a,b,c);
       })
       .attr("x", (text, index) => {
-				return 50*index
+				return Xscale(index)
 			})
-      .attr("y", 0)
-      .attr("height", text => Yscale(text))
-      .transition()
-      .duration(1000)
+      .attr("y", text => Yscale(text))
+      .attr("height", text => 190 - Yscale(text))
+			.transition()
+			.duration(1000)
       .attr("width", 25)
       .attr("fill", (text ,index) => {
           return Math.random() > 0.5 ? "green" : 'red'
@@ -90,20 +71,20 @@
       //make aixes
       d3.select("#fuck-you")
       .append("g")
-      .attr("transform","translate(0,180)")
+      .attr("transform","translate(0,190)")
       .call(axis);
 			//add top text
 			let texts = d3.select("#fuck-you").selectAll(".textBox")
-									.data(data3).enter().append("text")
-									.attr("class","textBox")
-									.attr("transform","translate(10,10)")
-									.attr("x", (text, index) =>{
-										return 50 * index
-									})
-									.attr("y", 0)
-									.attr("dx", -10)
-									.attr("dy", 0)
-									.text(text => text)
+			.data(data3).enter().append("text")
+			.attr("class","textBox")
+			.attr("transform","translate(10,10)")
+			.attr("x", (text, index) =>{
+				return Xscale(index)
+			})
+			.attr("y", item => Yscale(item))
+			.attr("dx", -10)
+			.attr("dy", 0)
+			.text(text => text)
     }
     makebar();
 	},false)
