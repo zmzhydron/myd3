@@ -3,88 +3,90 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<script src="jquery.js"></script>
 	<style>
 		#testspan{
 			color: lime;
 		}
-		.hehe{
+		#svgone{
 			width: 500px;
 			height: 200px;
 			border: solid 1px red;
 			padding: 10px;
 		}
-		.green{
+		rect{
+			transition: all 0.5s ease;
+		}
+		.greenone{
 			fill: green;
 		}
-		.red{
+		.redone{
 			fill: red;
+		}
+		.active{
+			fill: purple;
+			transform: scale(0.98);
+			transform: translate(10,10)
+		}
+		.none{
+
 		}
 	</style>
 	<script src="d3main.js"></script>
 </head>
 <body>
-	<div class="a" id='a'>aaa</div>
-	<div class="a">aaa</div>
-	<div class="a">aaa</div>
-	<div class="a">aaa</div>
-	<div class="a">aaa</div>
 </body>
 <script type="text/javascript">
 	let data1 = ['my','name','is','zhangmingzhi'];
 	let data2 = ['zmz'];
-
 	document.addEventListener('DOMContentLoaded', event => {
 		//add svg
 		let rectHeight = 50;
+		function makeSclae(domain,range){
+			return d3.scaleLinear().domain(domain).range(range)
+		}
     function makebar(){
       let data3 = Array.from({length: 10}).map( item => ~~(Math.random() * 1000));
-      d3.selectAll("svg").remove();
-      let Yscale = d3.scaleLinear().domain([0,d3.max(data3)]).range([190,0]);
-			let Xscale = d3.scaleLinear().domain([0,data3.length]).range([10,490]);
-      let scaleforAxis = d3.scaleLinear().domain([1,10]).range([10,490]);
-      let axis = d3.axisBottom(scaleforAxis);
-      let svg = d3.select("body")
-      .append("svg")
-      .attr("id","fuck-you")
-      .attr("class","hehe")
-      .selectAll("rect")
-      .data(data3)
-      .enter()
-      .append("rect")
-      .on("click", (text, index,a,b,c) => {
-          console.log(text,index,a,b,c);
-      })
-      .attr("x", (text, index) => {
-				return Xscale(index)
+			let Xscale = makeSclae([0,data3.length],[30,490]);
+			let Yscale = makeSclae([0,d3.max(data3)],[10,190]);
+			let YaxisSclae = makeSclae([d3.max(data3),0],[10,190]);
+			let XscaleForAxis = makeSclae([1,10],[25,445]);
+			let Xaxis = d3.axisBottom(XscaleForAxis);
+			let Yaxis = d3.axisLeft(YaxisSclae);
+    	let svg = d3.select("body")
+			.append("svg")
+			.attr("id","svgone");
+			svg.selectAll("rect")
+			.data(data3).enter().append("rect")
+			.attr("class","rectone")
+			.on("click", (item,index,all) => {
+				console.log(item,index,all)
 			})
-      .attr("y", text => Yscale(text))
-      .attr("height", text => 190 - Yscale(text))
+			.on("mouseover", (item, index, all) =>{
+				console.log(`say it ${item}`);
+
+				$(all[index]).addClass("active");
+			})
+			.on("mouseout", (item,index,all) =>{
+				$(all[index]).removeClass("active");
+			})
+			.attr("x", (item, index) =>{
+				return Xscale(index) + 5;
+			})
+			.attr("y",item => 190 - Yscale(item))
+			.attr("data-value", item => item)
 			.transition()
-			.duration(1000)
-      .attr("width", 25)
-      .attr("fill", (text ,index) => {
-          return Math.random() > 0.5 ? "green" : 'red'
-      })
-      .attr("data-value", (text, i) => {
-          return `current data is ${text}`
-      })
-      //make aixes
-      d3.select("#fuck-you")
-      .append("g")
-      .attr("transform","translate(0,190)")
-      .call(axis);
-			//add top text
-			let texts = d3.select("#fuck-you").selectAll(".textBox")
-			.data(data3).enter().append("text")
-			.attr("class","textBox")
-			.attr("transform","translate(10,10)")
-			.attr("x", (text, index) =>{
-				return Xscale(index)
+			.delay(function(d,i){
+			    return i * 200;
 			})
-			.attr("y", item => Yscale(item))
-			.attr("dx", -10)
-			.attr("dy", 0)
-			.text(text => text)
+			.duration(1000)
+			.attr("height", item =>  Yscale(item))
+			.attr("width", 35)
+
+			.attr("class", () => Math.random() > 0.5 ? "greenone" :"redone");
+
+			svg.append("g").attr("transform","translate(20,0)").call(Yaxis);
+			svg.append("g").attr("transform","translate(25,192)").call(Xaxis);
     }
     makebar();
 	},false)
