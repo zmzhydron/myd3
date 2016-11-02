@@ -38,54 +38,36 @@
 		let rectHeight = 50;
     function makebar(){
       let data3 = Array.from({length: 10}).map( item => ~~(Math.random() * 1000));
-      d3.selectAll("svg").remove();
-      let Yscale = d3.scaleLinear().domain([0,d3.max(data3)]).range([190,0]);
-			let Xscale = d3.scaleLinear().domain([0,data3.length]).range([10,490]);
-      let scaleforAxis = d3.scaleLinear().domain([1,10]).range([10,490]);
-      let axis = d3.axisBottom(scaleforAxis);
-      let svg = d3.select("body")
-      .append("svg")
-      .attr("id","fuck-you")
-      .attr("class","hehe")
-      .selectAll("rect")
-      .data(data3)
-      .enter()
-      .append("rect")
-      .on("click", (text, index,a,b,c) => {
-          console.log(text,index,a,b,c);
-      })
-      .attr("x", (text, index) => {
-				return Xscale(index)
-			})
-      .attr("y", text => Yscale(text))
-      .attr("height", text => 190 - Yscale(text))
-			.transition()
-			.duration(1000)
-      .attr("width", 25)
-      .attr("fill", (text ,index) => {
-          return Math.random() > 0.5 ? "green" : 'red'
-      })
-      .attr("data-value", (text, i) => {
-          return `current data is ${text}`
-      })
-      //make aixes
-      d3.select("#fuck-you")
-      .append("g")
-      .attr("transform","translate(0,190)")
-      .call(axis);
-			//add top text
-			let texts = d3.select("#fuck-you").selectAll(".textBox")
-			.data(data3).enter().append("text")
-			.attr("class","textBox")
-			.attr("transform","translate(10,10)")
-			.attr("x", (text, index) =>{
-				return Xscale(index)
-			})
-			.attr("y", item => Yscale(item))
-			.attr("dx", -10)
-			.attr("dy", 0)
-			.text(text => text)
+	  // let Xscale = d3.scaleLinear().domain([0,10]).range([10,490]);
+	  // let Yscale = d3.scaleLinear().domain([d3.max(data3),0]).range([10,190]);
+		// let scale = d3.scaleLinear().domain([0,d3.max(data3)]).range([10,190]);
+		let Xscale = d3.scaleLinear().domain([0,d3.max(data3)]).range([10,490]);
+		let Yscale = d3.scaleLinear().domain([0,10]).range([10,190]);
+		let scale = d3.scaleLinear().domain([0,d3.max(data3)]).range([10,400]);
+		// let Xaxis = d3.axisBottom(d3.scaleLinear().domain([1,10]).range([10,490]));
+		let Xaxis = d3.axisBottom(Xscale).ticks(10);
+	  let svg = d3.select("body")
+	  	.append('svg')
+			.attr("class","hehe");
+		svg.selectAll("rect")
+		.data(data3).enter().append("rect")
+		.attr("x", (item ,index) => 10)
+		.attr("y", (item, index) => Yscale(index))
+		.attr("width", item => Xscale(item))
+		.attr("height", 16)
+		.attr("data-value", item => item+" @")
+		.attr("fill", (item) => Math.random() > 0.5 ? "red" : "green");
+		svg.append("g").attr("transform","translate(0,190)").call(Xaxis);
+		svg.selectAll(".textbox").data(data3).enter().append("text")
+		.attr("class","text")
+		.attr("x", item => Xscale(item) - 20)
+		.attr("y", (item,index) => Yscale(index))
+		.attr('dy', 14)
+		.attr('dx', 9)
+		.text(item => item)
+
     }
+
     makebar();
 	},false)
 </script>
