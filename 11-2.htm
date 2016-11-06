@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="d3main.js"></script>
+	<style>
+		#svgone{
+			border: solid 1px red;
+			height: 200px;
+			width: 300px;
+		}
+		.green{
+			fill: green;
+		}
+		.red{
+			fill: red;
+		}
+		.text{
+			font-size: 10px;
+		}
+	</style>
+</head>
+<body>
+	
+</body>
+<script type="text/javascript">
+console.log(d3.json);
+	function makeScale(domain,range){
+		return d3.scaleLinear().domain(domain).range(range);
+	}
+	document.addEventListener("DOMContentLoaded", event =>{
+		let root = document;
+		let fakeArray = Array.from({length: 10}).map( item => ~~(Math.random()*10000));
+
+		let scaleforHeight = makeScale([0,d3.max(fakeArray)],[0,160]);
+		let scaleforXPos = makeScale([0,fakeArray.length - 1],[45,270]);
+		let scaleforXaxis = d3.axisBottom(makeScale([1,fakeArray.length],[45,270]));
+		let scaleforYaxis = d3.axisLeft(makeScale([d3.max(fakeArray)+d3.max(fakeArray)*0.1,0],[0,170]));
+
+
+		let svg = d3.select("body").append("svg").attr("id","svgone");
+		svg.selectAll("rect").data(fakeArray).enter().append("rect")
+		.attr("x", (item,index) => scaleforXPos(index))
+		.attr("y", (item,index) => 180 - scaleforHeight(item))
+		.attr('width', 20).attr("height", (item,index) => scaleforHeight(item))
+		.attr("fill", () => d3.schemeCategory10[~~(Math.random()*10)])
+		.attr("data-value", item => item)
+		.attr("data-height", item => scaleforHeight(item));
+		svg.selectAll(".text").data(fakeArray).enter().append('text').attr("class","text")
+		.attr("x",(d,j) => scaleforXPos(j))
+		.attr("y",(d,j) => 180 - scaleforHeight(d))
+		.text((d,j) => d);
+		svg.append("g").attr("transform","translate(40,10)").call(scaleforYaxis);
+		svg.append("g").attr("transform","translate(10,180)").call(scaleforXaxis);
+	},false)
+</script>
+</html>
