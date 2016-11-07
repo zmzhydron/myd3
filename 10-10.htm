@@ -15,7 +15,8 @@
 			padding: 10px;
 		}
 		rect{
-			transition: all 0.5s ease;
+			/*transition: all 0.5s ease;*/
+			transform-origin: 45% 45%;
 		}
 		.greenone{
 			fill: green;
@@ -25,11 +26,16 @@
 		}
 		.active{
 			fill: purple;
-			transform: scale(0.98);
-			transform: translate(10,10)
+			transform: translate(0,100);
+			transform: scale(1.05);
 		}
 		.none{
 
+		}
+		#pies{
+			display: block;
+			width: 1000px;
+			height: 500px;
 		}
 	</style>
 	<script src="d3main.js"></script>
@@ -79,16 +85,47 @@
 			.delay(function(d,i){
 			    return i * 200;
 			})
-			.duration(1000)
+			.duration(300)
 			.attr("height", item =>  Yscale(item))
 			.attr("width", 35)
-
 			.attr("class", () => Math.random() > 0.5 ? "greenone" :"redone");
-
 			svg.append("g").attr("transform","translate(20,0)").call(Yaxis);
 			svg.append("g").attr("transform","translate(25,192)").call(Xaxis);
     }
-    makebar();
+    // makebar();
+		function makePie(){
+			let data = [
+				{value:~~(Math.random()*100+10),name:"aa"},
+				{value:~~(Math.random()*100+10),name:"bb"},
+				{value:~~(Math.random()*100+10),name:"cc"},
+				{value:~~(Math.random()*100+10),name:"dd"},
+				{value:~~(Math.random()*100+10),name:"ee"},
+				{value:~~(Math.random()*100+10),name:"ff"}
+			];
+			// let colors = d3.scale.category10();
+			// console.log(colors);
+			let colors = ['red','green','blue','yellow','lime','gray'];
+			let pie = d3.pie();
+			let pieData = pie.value(item => item.value)(data);
+			console.log(pieData)
+			let arc = d3.arc().innerRadius(25).outerRadius(150);
+			console.log(arc);
+			let svg = d3.select("body").append("svg").attr("id","pies");
+			let arcs = svg.selectAll("g")
+			.data(pieData)
+			.enter()
+			.append("g")
+			.attr("transform","translate(150,150)");
+			arcs.append("path")
+			.attr("fill", (d,i) => {
+				console.log(d,i)
+				return colors[d.index]
+			})
+			.attr("d", d => arc(d));
+			arcs.append('text')
+			.text( item => item.data.name)
+		}
+		makePie();
 	},false)
 </script>
 </html>
