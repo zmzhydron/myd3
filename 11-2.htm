@@ -22,7 +22,9 @@
 	</style>
 </head>
 <body>
-	
+	<svg>
+		<rect height="100" width="200" fill="green"></rect>
+	</svg>
 </body>
 <script type="text/javascript">
 console.log(d3.json);
@@ -39,20 +41,20 @@ console.log(d3.json);
 		let scaleforYaxis = d3.axisLeft(makeScale([d3.max(fakeArray)+d3.max(fakeArray)*0.1,0],[0,170]));
 
 
-		let svg = d3.select("body").append("svg").attr("id","svgone");
-		svg.selectAll("rect").data(fakeArray).enter().append("rect")
-		.attr("x", (item,index) => scaleforXPos(index))
-		.attr("y", (item,index) => 180 - scaleforHeight(item))
-		.attr('width', 20).attr("height", (item,index) => scaleforHeight(item))
-		.attr("fill", () => d3.schemeCategory10[~~(Math.random()*10)])
-		.attr("data-value", item => item)
-		.attr("data-height", item => scaleforHeight(item));
-		svg.selectAll(".text").data(fakeArray).enter().append('text').attr("class","text")
-		.attr("x",(d,j) => scaleforXPos(j))
-		.attr("y",(d,j) => 180 - scaleforHeight(d))
-		.text((d,j) => d);
-		svg.append("g").attr("transform","translate(40,10)").call(scaleforYaxis);
-		svg.append("g").attr("transform","translate(10,180)").call(scaleforXaxis);
+		// let svg = d3.select("body").append("svg").attr("id","svgone");
+		// svg.selectAll("rect").data(fakeArray).enter().append("rect")
+		// .attr("x", (item,index) => scaleforXPos(index))
+		// .attr("y", (item,index) => 180 - scaleforHeight(item))
+		// .attr('width', 20).attr("height", (item,index) => scaleforHeight(item))
+		// .attr("fill", () => d3.schemeCategory10[~~(Math.random()*10)])
+		// .attr("data-value", item => item)
+		// .attr("data-height", item => scaleforHeight(item));
+		// svg.selectAll(".text").data(fakeArray).enter().append('text').attr("class","text")
+		// .attr("x",(d,j) => scaleforXPos(j))
+		// .attr("y",(d,j) => 180 - scaleforHeight(d))
+		// .text((d,j) => d);
+		// svg.append("g").attr("transform","translate(40,10)").call(scaleforYaxis);
+		// svg.append("g").attr("transform","translate(10,180)").call(scaleforXaxis);
 	},false)
 </script>
 </html>

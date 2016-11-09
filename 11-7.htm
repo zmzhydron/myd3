@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <style>
+   body{ -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;}
+    *{
+      padding: 0;
+      margin: 0;
+    }
+    .nodes{
+    	fill: rgba(242, 242, 242, 1);
+    }
+    .text{
+			stroke: #333333;
+			font-size: 12px;
+			stroke-width: 0;
+			text-align: center;
+    }
+    #fuckyou{
+    	height: 500px;
+    	width: 1050px;
+    }
+    .nodes{
+    }
+    .group{
+    	stroke: #797979;
+    	stroke-width: 1;
+    }
+    .group.active{
+    	/* stroke: red; */
+    }
+    .links{
+      stroke: black;
+      stroke-width: 0.5;
+    }
+    .boxes{
+      height: 24px;
+      width: 38px;
+    }
+
+  </style>
+</head>
+<body>
+  
+</body>
+<script type="text/javascript" src="d3v3.js"></script>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+	function calculateStrWidth(str,option){
+		var stringWidther = document.querySelector("#stringWidther");
+		if(!stringWidther){
+			var option = option || {};
+			var fontSize = option.fontSize || "12px";
+			stringWidther = document.createElement("DIV");
+			stringWidther.id = 'stringWidther';
+			var cssText = ["font-size:"+ fontSize+";","display:inline-block;","position:absolute;","visibility:hidden;","top:-10000px;"];
+			console.log(cssText.join(''));
+			stringWidther.style.cssText = cssText.join('');
+			document.body.appendChild(stringWidther);
+		}
+		stringWidther.innerHTML = str.trim();
+		return stringWidther.offsetWidth;
+	}
+  var lines = function(){
+    let tableData = {
+      nodes: [
+        {
+          name: "用户信息表",
+          id:"a",
+          x:0,
+          y:0,
+          nickname: 'bb'
+        },
+        {
+          name: "区域信息表",
+          id: "b",
+          x:100,
+          y:120
+        },
+        {
+          name: "小区流量表",
+          id: "c",
+          x:270,
+          y:200
+        },
+        {
+          name: "根因分析表",
+          id: "d",
+          x:170,
+          y:300
+        },
+        {
+          name: "离网表",
+          id: "e",
+          x:200,
+          y:110
+        }
+      ],
+      links: [
+        {
+          from:"用户信息表",
+          to: "区域信息表",
+          desc: {
+            name: "AB"
+          }
+        },
+        {
+          from:"用户信息表",
+          to: "小区流量表",
+          desc: {
+            name: "AC"
+          }
+        },
+        {
+          from:"用户信息表",
+          to: "根因分析表",
+          desc: {
+            name: "AD"
+          }
+        },
+        {
+          from:"用户信息表",
+          to: "离网表",
+          desc: {
+            name: "AE"
+          }
+        },
+        {
+          from:"区域信息表",
+          to: "小区流量表",
+          desc: {
+            name: "BC"
+          }
+        },
+        {
+          from:"区域信息表",
+          to: "根因分析表",
+          desc: {
+            name: "BD"
+          }
+        },
+        {
+          from:"区域信息表",
+          to: "根因分析表",
+          desc: {
+            name: "BE"
+          }
+        },
+        {
+          from:"小区流量表",
+          to: "根因分析表",
+          desc: {
+            name: "CD"
+          }
+        },
+        {
+          from:"小区流量表",
+          to: "离网表",
+          desc: {
+            name: "CE"
+          }
+        },
+        {
+          from:"根因分析表",
+          to: "离网表",
+          desc: {
+            name: "DE"
+          }
+        }
+      ]
+    };
+    const nodeWidth = 120, nodeHeight = 30, //svg中表高宽 
+          sx = 38, sy = 24, //表关系可点击模块高宽
+          hwx = nodeWidth / 2,
+          hwy = nodeHeight / 2,
+          hsx = sx / 2,
+          hsy = sy / 2,
+          safeDistance = 70,
+          svgWidth = 1050,
+          svgHeight = 500;
+    let fixPosX, fixPosY, //鼠标按下时候的相对于元素外层的距离；
+    		relateNodes; //和拖动表有关系的表，用于计算安全距离，避免过度拥挤。
+    let drag = d3.behavior.drag()
+    .on('dragstart',function(o){
+      let { x, y, name } = o;
+      fixPosY = d3.event.sourceEvent.offsetY - y; //点击点距离svg边框的距离
+      fixPosX = d3.event.sourceEvent.offsetX - x;
+    })
+    .on('drag', function(o){
+      let x = d3.event.x - fixPosX;
+      let y = d3.event.y - fixPosY;
+      //设置边界信息;
+      o.x = x = x < 0 ? 0 : ( x > svgWidth - nodeWidth ? svgWidth - nodeWidth : x );
+      o.y = y = y < 0 ? 0 : ( y > svgHeight - nodeHeight ? svgHeight - nodeHeight : y );
+      dragLines();
+    })
+    let svg = d3.select("body").append('svg').attr('id',"fuckyou").attr('width',svgWidth).attr("height",svgHeight);
+    let dragLines = function(){
+      let links = svg.selectAll(".links"),
+          boxes = svg.selectAll(".boxes"),
+          texts = svg.selectAll(".text"),
+          nodes = svg.selectAll(".nodes");
+          
+      //将from 和 to 对应的object的 x y 添加到对应的link对象中
+      tableData.links = tableData.links.map( (item,index) => {
+        let { from, to } = item;
+        let x1,x2,y1,y2;
+        let nodes_from = tableData.nodes.filter( item => item.name === from)[0];
+        let nodes_to = tableData.nodes.filter( item => item.name === to)[0];
+        return Object.assign({}, item,{
+          x1: nodes_from.x,
+          y1: nodes_from.y,
+          x2: nodes_to.x,
+          y2: nodes_to.y,
+        })
+      })
+      links.data(tableData.links)
+      .attr("x1", o => o.x1 + hwx)
+      .attr("y1", o => o.y1 + hwy)
+      .attr("x2", o => o.x2 + hwx)
+      .attr("y2", o => o.y2 + hwy);
+      boxes.data(tableData.links)
+      .attr("x", o =>o.x1 + (o.x2 - o.x1) / 2 + hwx - hsx)
+      .attr("y", o => o.y1 + (o.y2 - o.y1) / 2 + hwy - hsy);
+      nodes.data(tableData.nodes)
+      .attr("x", o => o.x).attr("y", o => o.y)
+      texts.data(tableData.nodes)
+      .attr("x", o => o.x + (120 - o.stringWidth) / 2).attr("y", o => o.y + hwy);
+    }
+    let updateStatus = function(){
+    	let links = svg.selectAll(".links"),
+    	    boxes = svg.selectAll(".boxes"),
+    	    texts = svg.selectAll(".text"),
+    	    nodes = svg.selectAll(".nodes"),
+    	    group = svg.selectAll(".group");
+    	group.data(tableData.nodes)
+    	.attr('class', o => o.refActive ? "group active" : "group");
+    }
+    let makeLine = function(){
+      svg.selectAll('.links').data(tableData.links).enter().append("line").attr("class","links");
+      svg.selectAll('.boxes').data(tableData.links).enter().append('image').attr('class','boxes')
+      .attr("href","bubble.png")
+      .on('click', item => {
+        console.log(item, d3.event);
+      })
+    	//add group
+    	let group = svg.selectAll(".group").data(tableData.nodes).enter().append("g")
+    	.attr('data-tablename',o => o.name)
+  		.on("click", function(o){
+  			let { name } = o;
+  			let relateNodes = tableData.links.filter( item => item.from === name || item.to === name)
+  			.map( item => item.to !== name ? item.to : item.from);
+  			tableData.nodes.forEach( item => {
+  				item.refActive = false;		
+  				relateNodes.forEach( j =>{
+  					if(item.name === j){
+  						item.refActive = true;		
+  					}
+  				})
+  			})
+  			updateStatus();
+  		})
+    	.attr('class',"group").call(drag);
+    	//add nodes
+  	  group.append("rect").attr('class',"nodes")
+  		.attr('fill','silver')
+  		.attr("x", item => item.x)
+  		.attr("y", item => item.y)
+  		.attr("width", nodeWidth+"px")
+  		.attr("height", nodeHeight+"px");
+      //add text 最后添加text，避免其他元素覆盖text
+      group.append("text").attr('class',"text")
+      .text(item => item.name);
+      //计算表名的长度，让其居中;
+      tableData.nodes.forEach( item => {
+      	item.stringWidth = calculateStrWidth(item.name);
+      })
+    }
+    makeLine();
+    dragLines();
+  }
+  document.addEventListener("DOMContentLoaded", function(){
+    lines();
+  })
+</script>
+</html>
