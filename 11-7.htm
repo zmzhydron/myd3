@@ -32,8 +32,12 @@
     	/* stroke: red; */
     }
     .links{
-      stroke: black;
-      stroke-width: 0.5;
+      stroke: #a2a2a2;
+      stroke-width: 2;
+    }
+    .links:hover{
+      stroke: red;
+      stroke-width: 4;
     }
     .boxes{
       height: 24px;
@@ -43,7 +47,11 @@
   </style>
 </head>
 <body>
-  
+  <div id="q">
+    <div id="w">
+      <div id="e"><button id="gogo">fuckyoutoo</button></div>
+    </div>
+  </div>
 </body>
 <script type="text/javascript" src="d3v3.js"></script>
 <script type="text/javascript" src="jquery.js"></script>
@@ -239,7 +247,17 @@
     	.attr('class', o => o.refActive ? "group active" : "group");
     }
     let makeLine = function(){
-      svg.selectAll('.links').data(tableData.links).enter().append("line").attr("class","links");
+      svg.selectAll('.links').data(tableData.links).enter().append("line")
+      .attr("class","links")
+      .on('mouseover',function(o){
+        console.log(o);
+        console.log(this);
+        // $(this).addClass("active");
+      })
+      .on('mouseout', function(){
+        console.log(`mouseout`);
+        // $(this).removeClass("active");
+      })
       svg.selectAll('.boxes').data(tableData.links).enter().append('image').attr('class','boxes')
       .attr("href","bubble.png")
       .on('click', item => {
@@ -248,7 +266,8 @@
     	//add group
     	let group = svg.selectAll(".group").data(tableData.nodes).enter().append("g")
     	.attr('data-tablename',o => o.name)
-  		.on("click", function(o){
+      //点击表名显示关联表
+  		.on("click", function(o){ 
   			let { name } = o;
   			let relateNodes = tableData.links.filter( item => item.from === name || item.to === name)
   			.map( item => item.to !== name ? item.to : item.from);
@@ -283,6 +302,9 @@
   }
   document.addEventListener("DOMContentLoaded", function(){
     lines();
+    $("#gogo").click(function(){
+      console.log(this.ownerDocument);
+    })
   })
 </script>
 </html>

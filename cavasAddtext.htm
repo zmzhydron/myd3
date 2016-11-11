@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<script type="text/javascript" src="jquery.js"></script>
+<link rel="stylesheet" href="">
+<body>
+	<input type ='file' id="upload"/>
+</body>
+	<script type="text/javascript">
+		document.addEventListener("DOMContentLoaded", event =>{
+			let upload = $("#upload");
+			upload.bind("change", function(event){
+				console.log($(this).val());
+				console.log(event);
+			})
+		},false)
+	</script>
+</html>
